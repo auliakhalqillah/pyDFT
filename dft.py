@@ -1,12 +1,16 @@
 # Name          : dft.py
 # Info          : Discrete Fourier Transform (DFT) Program
-# Written by    : Aulia Khalqillah, S.Si
-# Update        : December, 23 2019
+# Function file : dofft.py
+# Written by    : Aulia Khalqillah, S.Si., M.Si.
+# Update        : 10th March, 2020
 #---------------------------------------------------------------------------
 import math as m
 import csv
 import matplotlib.pyplot as plt
+from numpy import arange
 from random import random
+from scipy.fftpack import fft
+from dofft import dofft # call function file dofft.py
 
 # SIGNAL
 f1 = 20
@@ -16,83 +20,74 @@ signal = [];
 signal_rand = [];
 t = [];
 i = 0
-n = 500
+n = 2000
 while i < n:
-    # x = m.sin(m.radians(2*m.pi*f1*time))
     x = m.sin(2*m.pi*f1*time)
     xrd = x*random()
     signal.append(x)
     signal_rand.append(xrd)
     t.append(time)
-    print(time,"\t",x,"\t",xrd)
     time = time + dt
     i = i + 1
+
+print("Length of Data: ", len(signal_rand))
 
 with open("signal.csv","w") as f:
     fsignal = csv.writer(f, delimiter='\t')
     fsignal.writerows(zip(t,signal,signal_rand))
 
+topbound = 0.92
+bottombound = 0.08
+leftbound = 0.10
+rightbound = 0.95
+heighspace = 0.5
+widthspace = 0.35
 fig = plt.figure(1)
 fig1 = fig.add_subplot(211)
 plt.plot(t,signal,color='black', linewidth=0.5, label='Signal')
 plt.title('Sinusoidal Signal and Random Signal')
 plt.ylabel('Amplitude')
 plt.legend(loc='upper left')
+plt.grid()
+plt.subplots_adjust(top=topbound, bottom=bottombound, left=leftbound, right=rightbound, hspace=heighspace,wspace=widthspace)
 
 fig2 = fig.add_subplot(212)
 plt2 = plt.plot(t,signal_rand, color='red', linewidth=0.5, label='Random Signal')
 plt.xlabel('Time (s)')
 plt.ylabel('Amplitude')
 plt.legend(loc='upper left')
-plt.show()
+plt.grid()
+plt.subplots_adjust(top=topbound, bottom=bottombound, left=leftbound, right=rightbound, hspace=heighspace,wspace=widthspace)
 
-# DFT
-nfft = 1024
-N = len(signal_rand)
-if N <= nfft:
-    nfft = N
-else:
-    nfft = nfft
 
-fstep = 1/dt
-fr = 0
-freq = []
-j = 0
-# while j < nfft:
-#     fr = fr + (fstep/nfft)
-#     freq.append(fr)
-#     j = j + 1
+# DFT from function file
+freq, spectrum = dofft(signal_rand,1024,100)
 
-n = 0
-spectrum = []
-while n < nfft/2:
-    k = 0
-    sreal = 0.0
-    specreal = []
-    simag = 0.0
-    specim = []
-    while k < nfft:
-        sreal = sreal + (signal_rand[k]*m.cos(2*m.pi*k*n/nfft))
-        specreal.append(sreal)
-        simag = simag + (signal_rand[k]*m.sin(2*m.pi*k*n/nfft))
-        specim.append(simag)
-        k = k + 1
+# FFT from Python Library
+pyspectrum = fft(signal_rand,2048)
+pyspectrum = pyspectrum[:len(pyspectrum)//2]
+freq2 = arange(0,len(pyspectrum))/f1
 
-    fr = fr + (fstep/nfft)
-    freq.append(fr)
-    spec = ((specreal[n]*specreal[n]) + (specim[n]*specim[n]))*dt
-    spectrum.append(spec)
-    n = n + 1
+print("Length of FFT from python: ",len(pyspectrum))
+print("Length of DFT from function: ",len(spectrum))
 
-with open("spectrum.csv","w") as sp:
-    fspectrum = csv.writer(sp, delimiter='\t')
-    fspectrum.writerows(zip(freq,spectrum))
-
+# Plot Spectrum Comparison
 figspec = plt.figure(2)
-# fig1 = fig.add_subplot(211)
+fig3 = figspec.add_subplot(211)
 plt.plot(freq,spectrum,color='black', linewidth=0.5, label='Spectrum')
-plt.title('DFT')
+plt.title('DFT from written function')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('Spectrum')
 plt.legend(loc='upper left')
+plt.grid()
+plt.subplots_adjust(top=topbound, bottom=bottombound, left=leftbound, right=rightbound, hspace=heighspace,wspace=widthspace)
+
+fig4 = figspec.add_subplot(212)
+plt.plot(freq2, abs(pyspectrum),color='black', linewidth=0.5, label='Spectrum')
+plt.title('FFT from Python Library')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Spectrum')
+plt.legend(loc='upper left')
+plt.grid()
+plt.subplots_adjust(top=topbound, bottom=bottombound, left=leftbound, right=rightbound, hspace=heighspace,wspace=widthspace)
 plt.show()
