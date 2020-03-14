@@ -7,7 +7,6 @@ from math import *
 from numpy import *
 
 def dofft(signal,nfft,fs):
-    nfft = nfft*2
     N = len(signal)
     if N <= nfft:
         rod = nfft-N
@@ -22,7 +21,7 @@ def dofft(signal,nfft,fs):
 
     n = 0
     spectrum = []
-    while n < nfft/2:
+    while n < nfft:
         k = 0
         sreal = 0.0
         specreal = []
