@@ -61,15 +61,25 @@ plt.subplots_adjust(top=topbound, bottom=bottombound, left=leftbound, right=righ
 
 
 # DFT from function file
-freq, spectrum = dofft(signal_rand,1024,100)
+fs = 100
+nfft = 1024
+freq, spectrum = dofft(signal_rand,nfft,fs)
 
 # FFT from Python Library
-pyspectrum = fft(signal_rand,2048)
-pyspectrum = pyspectrum[:len(pyspectrum)//2]
-freq2 = arange(0,len(pyspectrum))/f1
+pyspectrum = fft(signal_rand,nfft)
+freq2 = arange(0,len(pyspectrum))/(nfft/fs)
+
+maxspec1 = max(spectrum)
+maxspec2 = max(abs(pyspectrum))
+id_maxspec1 = argmax(spectrum)
+id_maxspec2 = argmax(abs(pyspectrum))
+freq_spectrum = freq[id_maxspec1]
+freq_pyspectrum = freq2[id_maxspec2]
 
 print("Length of FFT from python: ",len(pyspectrum))
 print("Length of DFT from function: ",len(spectrum))
+print("Frequency from FFT Library:", freq_pyspectrum)
+print("Frequency from DFT Function:", freq_spectrum)
 
 # Plot Spectrum Comparison
 figspec = plt.figure(2)
