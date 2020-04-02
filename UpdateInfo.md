@@ -1,4 +1,4 @@
-# Update Script Information
+# Update Information
 ### 1st April 2020
 1. Simplify the code of `dofft.py` file
 2. Readjust the output terminal
